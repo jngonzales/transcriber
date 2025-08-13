@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎙️ Whisper AI Pro - Diarization Hybrid Edition</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-bg: #0a0a0a;
+      --secondary-bg: #1a1a1a;
+      --card-bg: #2a2a2a;
+      --accent-color: #00d4ff;
+      --accent-hover: #00b8e6;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --border-color: #333;
+      --success-color: #00ff88;
+      --warning-color: #ffaa00;
+      --error-color: #ff4444;
+      --highlight-color: #ffaa00; /* New color for karaoke highlight */
+      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --gradient-4: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      --shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+      --shadow-hover: 0 20px 60px rgba(0, 212, 255, 0.2);
+      --glass: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="light"] {
+      --primary-bg: #ffffff;
+      --secondary-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-primary: #2d3748;
+      --text-secondary: #718096;
+      --border-color: #e2e8f0;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.15);
+      --glass: rgba(0, 0, 0, 0.05);
+      --highlight-color: #ff8800;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--primary-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+
+    @keyframes backgroundShift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-5px, -10px) rotate(1deg); }
+      50% { transform: translate(10px, 5px) rotate(-1deg); }
+      75% { transform: translate(-2px, 8px) rotate(0.5deg); }
+    }
+
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: slideInDown 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .logo {
+      font-size: 4rem;
+      background: var(--gradient-4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      animation: logoFloat 3s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      animation: fadeIn 1s ease-out 0.5s both;
+    }
+
+    .beta-badge {
+      display: inline-block;
+      background: var(--gradient-2);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.2) rotate(180deg);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      animation: slideInUp 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 15px 25px;
+      background: var(--glass);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      display: block;
+    }
+
+    .main-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+      animation: staggerIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
+    }
+
+    .control-card {
+      background: var(--glass);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .control-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 3px;
+      background: var(--gradient-3);
+      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .control-card::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: radial-gradient(circle, var(--glass) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .control-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--accent-color);
+    }
+
+    .control-card:hover::before {
+      left: 0;
+    }
+
+    .control-card:hover::after {
+      width: 200px;
+      height: 200px;
+    }
+
+    .file-upload {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .file-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+      background: var(--gradient-1);
+      color: white;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600;
+      text-align: center;
+      min-height: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-label::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.4s ease;
+    }
+
+    .file-label:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .file-label:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .file-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      animation: pulse 2s infinite;
+    }
+
+    .model-select {
+      width: 100%;
+      padding: 18px;
+      background: var(--secondary-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 15px;
+      color: var(--text-primary);
+      font-size: 16px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .model-select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15);
+      transform: scale(1.02);
+    }
+
+    .model-info {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .model-select:focus + .model-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 20px 40px;
+      background: var(--gradient-3);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .action-btn:hover:not(:disabled) {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-btn.secondary {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border: 2px solid var(--accent-color);
+    }
+
+    .action-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .action-btn:active::after {
+      width: 400px;
+      height: 400px;
+    }
+
+    .processing-options {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .option-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .option-toggle:hover {
+      color: var(--accent-color);
+    }
+
+    .option-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color);
+    }
+
+    .status-bar {
+      background: var(--glass);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      backdrop-filter: blur(20px);
+      animation: slideInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) 0.9s both;
+      box-shadow: var(--shadow);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    .status-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .status-icon.loading {
+      background: var(--warning-color);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .status-icon.success {
+      background: var(--success-color);
+      animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .status-icon.error {
+      background: var(--error-color);
+      animation: errorShake 0.6s ease-in-out;
+    }
+
+    @keyframes successPop {
+      0% { transform: scale(0) rotate(180deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .detailed-progress {
+      margin-top: 15px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient-3);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .2) 50%,
+        rgba(255, 255, 255, .2) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 50px 50px;
+      animation: move 2s linear infinite;
+    }
+
+    @keyframes move {
+      0% { background-position: 0 0; }
+      100% { background-position: 50px 50px; }
+    }
+
+    .progress-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .media-container {
+      background: var(--glass);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      text-align: center;
+      animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+
+    .media-container video, .media-container audio {
+        max-width: 100%;
+        border-radius: 15px;
+        display: block;
+    }
+
+    .transcript-container {
+      background: var(--glass);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 25px;
+      max-height: 500px; /* Keep max-height for scrollability */
+      overflow-y: auto; /* Enable vertical scrolling */
+      line-height: 2;
+      font-size: 16px;
+      position: relative;
+      animation: slideInRight 1s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+
+    .transcript-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .transcript-container::-webkit-scrollbar-track {
+      background: var(--border-color);
+      border-radius: 10px;
+    }
+
+    .transcript-container::-webkit-scrollbar-thumb {
+      background: var(--accent-color);
+      border-radius: 10px;
+    }
+
+    .transcript-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--secondary-bg);
+      flex-wrap: wrap;
+      gap: 15px;
+      position: sticky; /* Make header sticky */
+      top: 0;
+      z-index: 2; /* Ensure it stays above content */
+    }
+
+    .transcript-header h3 {
+      background: var(--gradient-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.3rem;
+    }
+
+    .transcript-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .transcript-content {
+      /* Removed padding/max-height/overflow from here, moved to .transcript-container */
+      position: relative; /* Keep for child positioning */
+      padding-top: 25px; /* Add top padding to separate from sticky header */
+      padding-bottom: 25px; /* Add bottom padding */
+    }
+
+    .corrected-transcript {
+      padding: 25px;
+      background: var(--secondary-bg);
+      border-top: 1px solid var(--border-color);
+      line-height: 2;
+      font-size: 16px;
+      animation: slideInUp 0.5s ease;
+    }
+
+    .word {
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      display: inline-block;
+      margin: 3px;
+      border: 1px solid transparent;
+    }
+
+    .word:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-2px) scale(1.05);
+      border-color: var(--accent-color);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+    }
+
+    /* Style for the clicked word */
+    .word.active {
+      background: var(--accent-color);
+      color: white;
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+      animation: wordHighlight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    /* Style for the currently playing word (karaoke effect) */
+    .word.current {
+        color: var(--highlight-color);
+        font-weight: bold;
+    }
+    
+    .speaker-label {
+        display: block;
+        font-weight: bold;
+        color: var(--accent-color);
+        margin-top: 15px;
+        margin-bottom: 5px;
+        font-size: 1.1em;
+        width: 100%; /* Ensure it takes full width */
+    }
+
+    .confidence-indicator {
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      border-radius: 1px;
+      opacity: 0.7;
+    }
+
+    .confidence-high { background: var(--success-color); }
+    .confidence-medium { background: var(--warning-color); }
+    .confidence-low { background: var(--error-color); }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 50px;
+    }
+
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeInScale 0.8s cubic-bezier(0.4, 0, 0.2, 1) calc(1.2s + var(--delay)) both;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, var(--accent-color), transparent);
+      animation: rotate 4s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover::before {
+      opacity: 0.1;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--accent-color);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: iconFloat 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+
+    .feature-desc {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .export-options {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .export-btn {
+      padding: 8px 16px;
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .export-btn:hover {
+      background: var(--accent-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .chunk-progress {
+      display: flex;
+      gap: 2px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chunk-bar {
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 20px;
+    }
+
+    .chunk-bar.processing {
+      background: var(--warning-color);
+      animation: pulse 1s infinite;
+    }
+
+    .chunk-bar.complete {
+      background: var(--success-color);
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--error-color);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      color: var(--error-color);
+      animation: errorSlideIn 0.3s ease;
+    }
+
+    @keyframes errorSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes staggerIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes wordHighlight { 0% { transform: scale(1); } 50% { transform: scale(1.15) rotate(2deg); } 100% { transform: scale(1.1) rotate(0deg); } }
+
+    @media (max-width: 768px) {
+      .main-controls, .feature-grid { grid-template-columns: 1fr; }
+      .logo { font-size: 2.5rem; }
+      .container { padding: 15px; }
+      .transcript-header { flex-direction: column; align-items: stretch; }
+      .transcript-actions { justify-content: center; }
+      .stats-bar { flex-direction: column; gap: 20px; }
+      .processing-options { justify-content: center; }
+      .custom-player { flex-wrap: wrap; }
+      .seek-bar-container { width: 100%; order: 1; margin-top: 10px; }
+    }
+
+    .hidden { display: none !important; }
+
+    .loading-spinner {
+      border: 3px solid var(--border-color);
+      border-top: 3px solid var(--accent-color);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 15px 20px;
+      backdrop-filter: blur(20px);
+      z-index: 1001;
+      transform: translateX(-400px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow);
+      max-width: 300px;
+    }
+
+    .notification.show { transform: translateX(0); }
+    .notification.success { border-left: 4px solid var(--success-color); }
+    .notification.warning { border-left: 4px solid var(--warning-color); }
+    .notification.error { border-left: 4px solid var(--error-color); }
+    .notification.info { border-left: 4px solid var(--accent-color); }
+
+
+    .waveform-container {
+      height: 80px;
+      background: var(--secondary-bg);
+      border-radius: 10px;
+      margin: 15px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .waveform-bar {
+      position: absolute;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent-color);
+      border-radius: 2px;
+      opacity: 0.7;
+      animation: waveAnimation 2s ease-in-out infinite;
+    }
+
+    @keyframes waveAnimation {
+      0%, 100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* Custom Media Player Styles */
+    audio, video {
+        width: 100%;
+    }
+    .custom-player {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--secondary-bg);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .play-pause-btn {
+        background: var(--accent-color);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        color: var(--primary-bg);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .play-pause-btn:hover {
+        background: var(--accent-hover);
+        transform: scale(1.1);
+    }
+
+    .time-display {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        min-width: 85px;
+        text-align: center;
+    }
+
+    .seek-bar-container {
+        flex-grow: 1;
+        height: 10px;
+        background: var(--border-color);
+        border-radius: 5px;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .seek-bar-progress {
+        height: 100%;
+        width: 0;
+        background: var(--accent-color);
+        border-radius: 5px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+
+    .volume-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .volume-btn {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .volume-btn:hover {
+        color: var(--accent-color);
+    }
+
+    .volume-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 80px;
+        height: 5px;
+        background: var(--border-color);
+        border-radius: 5px;
+        outline: none;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    /* New Footer Styles */
+    .footer {
+      margin-top: 60px; /* Space from the content above */
+      padding: 30px 20px; /* Vertical padding and horizontal padding */
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border-color); /* A subtle separator line */
+      background: var(--secondary-bg); /* A slightly different background */
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="bg-pattern"></div>
+  <div class="floating-particles" id="particles"></div>
+
+  <div class="theme-toggle" id="themeToggle">
+    <span id="themeIcon">🌙</span>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo" id="logo">🎙️ Whisper AI Pro</div>
+      <div class="tagline">Advanced Speech Recognition with AI-Powered Enhancements</div>
+      <div class="beta-badge">✨ Hybrid Edition</div>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-number" id="filesProcessed">0</span>
+        <span>Files Processed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="totalDuration">0:00</span>
+        <span>Total Duration</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="averageAccuracy">--</span>
+        <span>Avg. Accuracy</span>
+      </div>
+    </div>
+
+    <div class="main-controls">
+      <div class="control-card">
+        <h3 style="margin-bottom: 20px; color: var(--accent-color);">📁 Upload Media</h3>
+        <div class="file-upload">
+          <input type="file" id="file" class="file-input" accept="audio/*,video/*">
+          <label for="file" class="file-label">
+            <div class="file-icon">📎</div>
+            <span id="fileLabelText">Choose Audio or Video File</span>
+            <small style="margin-top: 8px; opacity: 0.8;">Supports MP3, MP4, WAV, M4A and more</small>
+          </label>
+        </div>
+        <div class="processing-options">
+          <label class="option-toggle" id="enhanceAudioToggle">
+            <input type="checkbox" id="enhanceAudio" checked>
+            <span>Enhance Audio (Browser)</span>
+          </label>
+          <label class="option-toggle" id="detectLanguageToggle">
+            <input type="checkbox" id="detectLanguage" checked>
+            <span>Auto-detect Language</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="control-card">
+        <h3 style="margin-bottom: 20px; color: var(--accent-color);">🤖 AI Model</h3>
+        <select id="model" class="model-select">
+          <option value="Xenova/whisper-tiny">Tiny (In-Browser)</option>
+          <option value="Xenova/whisper-base" selected>Base (In-Browser)</option>
+          <option value="Xenova/whisper-small">Small (In-Browser)</option>
+          <option value="local_backend/large-v3">Large v3 (Local Backend)</option>
+          <option value="local_backend/large-v3-diarize">Large v3 + Diarization (Local Backend)</option>
+        </select>
+        <div class="model-info" id="model-info">
+          Select a model to run in your browser or on the local backend.
+        </div>
+      </div>
+
+      <div class="control-card">
+        <h3 style="margin-bottom: 20px; color: var(--accent-color);">⚡ Processing</h3>
+        <button id="go" class="action-btn">
+          <span>🚀 Start Transcription</span>
+        </button>
+        <div class="processing-options">
+          <label class="option-toggle">
+            <input type="checkbox" id="showConfidence" checked>
+            <span>Show Confidence</span>
+          </label>
+          <label class="option-toggle">
+            <input type="checkbox" id="autoCorrect">
+            <span>Auto-Tidy Text</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-icon" id="statusIcon"></div>
+        <span id="status">Ready to transcribe your media files</span>
+      </div>
+      <div class="status-item hidden" id="langStatus">
+        <div class="status-icon success">🌐</div>
+        <span id="lang"></span>
+      </div>
+      <div class="status-item hidden" id="fileInfoStatus">
+        <div class="status-icon success">📊</div>
+        <span id="fileInfo"></span>
+      </div>
+      <div class="detailed-progress hidden" id="detailedProgress">
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">Initializing...</div>
+        <div class="chunk-progress" id="chunkProgress"></div>
+      </div>
+    </div>
+
+    <div class="media-container hidden" id="mediaContainer">
+      <video id="video" class="hidden"></video>
+      <audio id="audio" class="hidden"></audio>
+      <div class="custom-player hidden" id="customPlayer">
+          <button class="play-pause-btn" id="playPauseBtn">▶</button>
+          <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+          <div class="seek-bar-container" id="seekBarContainer">
+              <div class="seek-bar-progress" id="seekBarProgress"></div>
+          </div>
+          <div class="volume-container">
+              <button class="volume-btn" id="volumeBtn">🔊</button>
+              <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+          </div>
+      </div>
+    </div>
+
+    <div class="transcript-container hidden" id="transcriptContainer">
+      <div class="transcript-header">
+        <h3>📝 Transcript</h3>
+        <div class="transcript-actions">
+          <button id="tidyTextBtn" class="action-btn secondary" style="width: auto; padding: 10px 20px; font-size: 14px;">✨ Tidy Up Text</button>
+          <button id="downloadTranscript" class="action-btn secondary" style="width: auto; padding: 10px 20px; font-size: 14px;">💾 Download</button>
+          <button id="copyTranscript" class="action-btn secondary" style="width: auto; padding: 10px 20px; font-size: 14px;">📋 Copy</button>
+        </div>
+      </div>
+      <div class="transcript-content" id="transcript"></div>
+      <div class="corrected-transcript hidden" id="correctedContainer">
+        <h4 style="margin-bottom: 15px; color: var(--accent-color);">✨ Tidied-Up Text</h4>
+        <div id="corrected-output"></div>
+        <div class="export-options">
+          <button class="export-btn" onclick="exportText('txt')">📄 TXT</button>
+          <button class="export-btn" onclick="exportText('srt')">🎬 SRT</button>
+          <button class="export-btn" onclick="exportText('vtt')">📺 VTT</button>
+          <button class="export-btn" onclick="exportText('json')">📊 JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card" style="--delay: 0s;">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title">Hybrid AI Power</div>
+        <div class="feature-desc">Use fast in-browser models or switch to the powerful local backend for maximum accuracy.</div>
+      </div>
+      <div class="feature-card" style="--delay: 0.1s;">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-title">Unmatched Accuracy</div>
+        <div class="feature-desc">The local backend uses `large-v3`, handling noise, accents, and complex audio with ease.</div>
+      </div>
+       <div class="feature-card" style="--delay: 0.2s;">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-title">100+ Languages</div>
+        <div class="feature-desc">Accurately transcribes audio in over 100 languages with automatic detection.</div>
+      </div>
+      <div class="feature-card" style="--delay: 0.3s;">
+        <div class="feature-icon">🗣️</div>
+        <div class="feature-title">Speaker Diarization</div>
+        <div class="feature-desc">Identify and label different speakers in a conversation (e.g., Speaker 1, Speaker 2).</div>
+      </div>
+      <div class="feature-card" style="--delay: 0.4s;">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Precision Timing</div>
+        <div class="feature-desc">Word-level timestamps with confidence indicators for perfect audio-text synchronization.</div>
+      </div>
+      <div class="feature-card" style="--delay: 0.5s;">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Privacy First</div>
+        <div class="feature-desc">Your audio either stays in your browser or is sent to a server running only on your computer.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 JN Gonzales. All rights reserved.</p>
+  </footer>
+
+<script type="module">
+import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.1.0';
+
+// DOM Elements
+const fileInput = document.getElementById('file');
+const fileLabelText = document.getElementById('fileLabelText');
+const modelSelect = document.getElementById('model');
+const goBtn = document.getElementById('go');
+const statusEl = document.getElementById('status');
+const statusIcon = document.getElementById('statusIcon');
+const transcriptEl = document.getElementById('transcript');
+const transcriptContainer = document.getElementById('transcriptContainer');
+const videoEl = document.getElementById('video');
+const audioEl = document.getElementById('audio');
+const mediaContainer = document.getElementById('mediaContainer');
+const langEl = document.getElementById('lang');
+const langStatus = document.getElementById('langStatus');
+const fileInfoStatus = document.getElementById('fileInfoStatus');
+const fileInfo = document.getElementById('fileInfo');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const detailedProgress = document.getElementById('detailedProgress');
+const chunkProgress = document.getElementById('chunkProgress'); // Still used for browser-based progress
+const tidyTextBtn = document.getElementById('tidyTextBtn');
+const correctedOutputEl = document.getElementById('corrected-output');
+const correctedContainer = document.getElementById('correctedContainer');
+const downloadTranscript = document.getElementById('downloadTranscript');
+const copyTranscript = document.getElementById('copyTranscript');
+const enhanceAudio = document.getElementById('enhanceAudio');
+const detectLanguage = document.getElementById('detectLanguage');
+const showConfidence = document.getElementById('showConfidence');
+const autoCorrect = document.getElementById('autoCorrect');
+const modelInfo = document.getElementById('model-info');
+const enhanceAudioToggle = document.getElementById('enhanceAudioToggle'); // For disabling
+const detectLanguageToggle = document.getElementById('detectLanguageToggle'); // For disabling
+
+// **FIX:** Get references to the stats bar elements
+const filesProcessedEl = document.getElementById('filesProcessed');
+const totalDurationEl = document.getElementById('totalDuration');
+const averageAccuracyEl = document.getElementById('averageAccuracy');
+
+
+// Custom Player Elements
+const customPlayer = document.getElementById('customPlayer');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const timeDisplay = document.getElementById('timeDisplay');
+const seekBarContainer = document.getElementById('seekBarContainer');
+const seekBarProgress = document.getElementById('seekBarProgress');
+const volumeBtn = document.getElementById('volumeBtn');
+const volumeSlider = document.getElementById('volumeSlider');
+
+// State
+let FFmpeg, fetchFile, toBlobURL, ffmpeg; // Keep for browser-based audio enhancement
+let usingVideo = false;
+let lastActiveSpan = null;
+let words = []; // Stores word objects with text, timestamp, score, and potentially speaker
+let fullTranscript = ''; // Stores the full text, potentially with speaker labels
+let currentAudioDuration = 0;
+let processedFiles = 0;
+let totalProcessedDuration = 0;
+let accuracyScores = [];
+let isProcessing = false;
+let currentWordSpan = null;
+
+// Define your backend URL here.
+// **** THIS HAS BEEN UPDATED WITH YOUR NGROK URL ****
+const LARGE_V3_BACKEND_URL = "https://8dde9107825c.ngrok-free.app/transcribe";
+
+// --- UTILITY FUNCTIONS ---
+function setStatus(msg, type = 'info') {
+  statusEl.textContent = msg;
+  statusIcon.className = 'status-icon';
+
+  statusIcon.innerHTML = '';
+  if (type === 'loading') { statusIcon.classList.add('loading'); statusIcon.innerHTML = '<div class="loading-spinner"></div>'; }
+  else if (type === 'success') { statusIcon.classList.add('success'); statusIcon.textContent = '✓'; }
+  else if (type === 'error') { statusIcon.classList.add('error'); statusIcon.textContent = '✗'; }
+  else { statusIcon.textContent = 'ℹ️'; }
+}
+
+function updateProgress(percent, text = '') {
+  progressFill.style.width = `${Math.min(percent, 100)}%`;
+  if (text) progressText.textContent = text;
+}
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.classList.add('show'), 10);
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => document.body.removeChild(notification), 300);
+  }, 4000);
+}
+
+function formatPlayerTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
+function activePlayer() {
+  return usingVideo ? videoEl : audioEl;
+}
+
+function resetUI() {
+  transcriptEl.innerHTML = '';
+  transcriptContainer.classList.add('hidden');
+  correctedContainer.classList.add('hidden');
+  correctedOutputEl.innerHTML = '';
+  words = [];
+  fullTranscript = '';
+  langStatus.classList.add('hidden');
+  fileInfoStatus.classList.add('hidden');
+  detailedProgress.classList.add('hidden');
+  lastActiveSpan = null;
+  currentWordSpan = null;
+  chunkProgress.innerHTML = '';
+  customPlayer.classList.add('hidden');
+}
+
+// **FIX:** Use the correct element variables in the function
+function updateStats() {
+  filesProcessedEl.textContent = processedFiles.toString();
+  totalDurationEl.textContent = formatPlayerTime(totalProcessedDuration);
+  if (accuracyScores.length > 0) {
+    const avgAccuracy = accuracyScores.reduce((a, b) => a + b, 0) / accuracyScores.length;
+    averageAccuracyEl.textContent = `${Math.round(avgAccuracy)}%`;
+  } else {
+    averageAccuracyEl.textContent = `--`;
+  }
+}
+
+function createChunkIndicators(numChunks) {
+  chunkProgress.innerHTML = '';
+  for (let i = 0; i < numChunks; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'chunk-bar';
+    bar.id = `chunk-${i}`;
+    chunkProgress.appendChild(bar);
+  }
+}
+
+function updateChunkProgress(chunkIndex, status) {
+  const chunkBar = document.getElementById(`chunk-${chunkIndex}`);
+  if (chunkBar) chunkBar.className = `chunk-bar ${status}`;
+}
+
+function getConfidenceLevel(score) {
+  if (typeof score !== 'number' || isNaN(score)) return 'high';
+  if (score >= 0.9) return 'high';
+  if (score >= 0.7) return 'medium';
+  return 'low';
+}
+
+function renderTranscript() {
+  transcriptEl.innerHTML = '';
+  let lastSpeaker = null;
+
+  words.forEach((w, index) => {
+    if (!w.text.trim() || !w.timestamp || w.timestamp.length < 2 || isNaN(w.timestamp[0]) || isNaN(w.timestamp[1])) {
+        return;
+    }
+
+    if (w.speaker && w.speaker !== lastSpeaker) {
+        const speakerLabel = document.createElement('span');
+        speakerLabel.className = 'speaker-label';
+        speakerLabel.textContent = `${w.speaker}:`;
+        transcriptEl.appendChild(speakerLabel);
+        lastSpeaker = w.speaker;
+    }
+
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.id = `word-${index}`;
+    span.textContent = w.text;
+    span.dataset.start = w.timestamp[0];
+    span.dataset.end = w.timestamp[1];
+    span.title = `Confidence: ${w.score ? (w.score * 100).toFixed(1) + '%' : 'N/A'}${w.speaker ? ` (Speaker: ${w.speaker})` : ''}`;
+
+    if (showConfidence.checked) {
+      const indicator = document.createElement('div');
+      indicator.className = `confidence-indicator confidence-${getConfidenceLevel(w.score)}`;
+      span.appendChild(indicator);
+    }
+
+    span.addEventListener('click', () => {
+      if (lastActiveSpan) {
+          lastActiveSpan.classList.remove('active');
+      }
+      span.classList.add('active');
+      lastActiveSpan = span;
+      activePlayer().currentTime = parseFloat(span.dataset.start);
+      activePlayer().play();
+    });
+
+    transcriptEl.appendChild(span);
+    transcriptEl.appendChild(document.createTextNode(' '));
+  });
+
+  if (autoCorrect.checked && fullTranscript) {
+    setTimeout(() => tidyTextBtn.click(), 1000);
+  }
+}
+
+// --- CORE LOGIC (IN-BROWSER MODELS) ---
+async function decodeAudio(blob) {
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioCtx = new AudioContext({ sampleRate: 16000 });
+  const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+  return decoded.getChannelData(0);
+}
+
+async function loadFFmpeg() {
+    const FFMPEG_VERSION = '0.12.6';
+    if (!FFmpeg) {
+        setStatus('Loading video processing tools...', 'loading');
+        const ffmpegModule = await import(`https://unpkg.com/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/esm/index.js`);
+        FFmpeg = ffmpegModule.FFmpeg;
+        const utilModule = await import(`https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js`);
+        fetchFile = utilModule.fetchFile;
+        toBlobURL = utilModule.toBlobURL;
+
+        ffmpeg = new FFmpeg();
+        ffmpeg.on('progress', ({ progress }) => {
+            updateProgress(30 + (progress * 15), 'Converting video to audio...');
+        });
+
+        const coreURL = await toBlobURL(`https://unpkg.com/@ffmpeg/core@${FFMPEG_VERSION}/dist/esm/ffmpeg-core.js`, 'text/javascript');
+        const wasmURL = await toBlobURL(`https://unpkg.com/@ffmpeg/core@${FFMPEG_VERSION}/dist/esm/ffmpeg-core.wasm`, 'application/wasm');
+        await ffmpeg.load({ coreURL, wasmURL });
+    }
+}
+
+async function extractAudio(file) {
+    await loadFFmpeg();
+    
+    await ffmpeg.writeFile('in', await fetchFile(file));
+    const filterArgs = enhanceAudio.checked
+        ? ['-i', 'in', '-vn', '-ac', '1', '-ar', '16000', '-af', 'highpass=f=200,lowpass=f=3000', '-f', 'wav', 'out.wav']
+        : ['-i', 'in', '-vn', '-ac', '1', '-ar', '16000', '-f', 'wav', 'out.wav'];
+    await ffmpeg.exec(filterArgs);
+    const data = await ffmpeg.readFile('out.wav');
+    
+    return new Blob([data.buffer], { type: 'audio/wav' });
+}
+
+async function processLongAudioInBrowser(decodedAudio, transcriber) {
+    setStatus('AI is transcribing in browser...', 'loading');
+    chunkProgress.classList.remove('hidden');
+
+    const result = await transcriber(decodedAudio, {
+        language: detectLanguage.checked ? undefined : 'en',
+        return_timestamps: 'word',
+        chunk_length_s: 30,
+        stride_length_s: 8,
+        progress_callback: (p) => {
+            if (p.status === 'transcribe') {
+                const progress = (p.progress / p.total) * 100;
+                updateProgress(60 + (progress * 0.35), `Transcription in progress: ${Math.round(progress)}%`);
+                if (p.total > 1) {
+                    if (chunkProgress.children.length !== p.total) {
+                        createChunkIndicators(p.total);
+                    }
+                    if (p.progress > 1) {
+                        updateChunkProgress(p.progress - 2, 'complete');
+                    }
+                    updateChunkProgress(p.progress - 1, 'processing');
+                }
+            }
+        }
+    });
+
+    if (chunkProgress.children.length > 0) {
+        updateChunkProgress(chunkProgress.children.length - 1, 'complete');
+    }
+
+    return result;
+}
+
+
+// --- EVENT HANDLERS ---
+fileInput.addEventListener('change', async () => {
+  const file = fileInput.files?.[0];
+  if (!file) return;
+
+  resetUI();
+
+  const url = URL.createObjectURL(file);
+  usingVideo = file.type.startsWith('video/');
+
+  videoEl.classList.toggle('hidden', !usingVideo);
+  audioEl.classList.toggle('hidden', usingVideo);
+
+  const player = activePlayer();
+  player.controls = false;
+  player.src = url;
+
+  player.addEventListener('loadedmetadata', () => {
+    currentAudioDuration = player.duration;
+    mediaContainer.classList.remove('hidden');
+    customPlayer.classList.remove('hidden');
+    fileInfoStatus.classList.remove('hidden');
+
+    fileInfo.textContent = `${file.name} • ${formatFileSize(file.size)} • ${formatPlayerTime(currentAudioDuration)}`;
+    setStatus(`Loaded: ${file.name}`, 'success');
+    fileLabelText.textContent = file.name;
+    showNotification('File loaded successfully!', 'success');
+  }, { once: true });
+});
+
+modelSelect.addEventListener('change', () => {
+    const selectedModel = modelSelect.value;
+    if (selectedModel.includes('local_backend')) {
+        modelInfo.innerHTML = "This model runs on your local Python server (`app.py`).<br>Requires `app.py` to be running.";
+        enhanceAudioToggle.classList.add('hidden');
+        enhanceAudio.checked = false;
+        detectLanguageToggle.classList.add('hidden');
+        detectLanguage.checked = true;
+        chunkProgress.classList.add('hidden');
+    } else {
+        modelInfo.innerHTML = "This model runs entirely in your web browser. Performance depends on your device.";
+        enhanceAudioToggle.classList.remove('hidden');
+        detectLanguageToggle.classList.remove('hidden');
+        chunkProgress.classList.remove('hidden');
+    }
+    if (selectedModel === 'local_backend/large-v3-diarize') {
+        modelInfo.innerHTML += "<br><span style='color: var(--warning-color); font-weight: bold;'>Requires Hugging Face token for diarization model (set HUGGING_FACE_HUB_TOKEN env var).</span>";
+    }
+});
+
+goBtn.addEventListener('click', async () => {
+  const file = fileInput.files?.[0];
+  if (!file) {
+    setStatus('Please select a file first', 'error');
+    showNotification('Please select a file first', 'error');
+    return;
+  }
+  if (isProcessing) {
+    showNotification('Processing already in progress', 'warning');
+    return;
+  }
+
+  isProcessing = true;
+  goBtn.disabled = true;
+  transcriptContainer.classList.add('hidden');
+  detailedProgress.classList.remove('hidden');
+  updateProgress(0, 'Initializing...');
+
+  const selectedModel = modelSelect.value;
+  let result;
+
+  try {
+    if (selectedModel.startsWith('local_backend')) {
+        // --- BACKEND PATH ---
+        goBtn.innerHTML = '<div class="loading-spinner"></div> Processing on Server...';
+        const formData = new FormData();
+        formData.append('file', file);
+
+        let diarizeFlag = 'false';
+        if (selectedModel === 'local_backend/large-v3-diarize') {
+            diarizeFlag = 'true';
+            updateProgress(10, 'Preparing for Diarization & Transcription...');
+        }
+        formData.append('diarize', diarizeFlag);
+
+        // Fetch to your local backend server via your NGROK URL
+        const response = await fetch(LARGE_V3_BACKEND_URL, {
+          method: 'POST',
+          body: formData, // No Content-Type header needed for FormData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Server returned an error');
+        }
+        result = await response.json();
+        updateProgress(90, 'Received transcript from server...');
+
+    } else {
+        // --- IN-BROWSER PATH ---
+        goBtn.innerHTML = '<div class="loading-spinner"></div> Processing in Browser...';
+        chunkProgress.classList.remove('hidden');
+
+        let transcriber;
+        try {
+          transcriber = await pipeline('automatic-speech-recognition', selectedModel, {
+            progress_callback: (data) => {
+              if (data.status === 'progress') {
+                const percent = (data.progress / data.total) * 100;
+                updateProgress(5 + (percent * 0.2), `Loading model: ${Math.round(percent)}%`);
+              }
+            }
+          });
+        } catch (err) {
+          console.warn("WebGPU not available, falling back to WASM:", err);
+          setStatus('WebGPU not supported, using CPU (slower)...', 'loading');
+          showNotification('Using CPU fallback - this may take longer', 'warning');
+          transcriber = await pipeline('automatic-speech-recognition', selectedModel, { device: 'wasm' });
+        }
+        
+        updateProgress(25, 'Preparing audio...');
+        const audioBlob = usingVideo ? await extractAudio(file) : file; 
+        updateProgress(45, 'Decoding audio...');
+        const decodedAudio = await decodeAudio(audioBlob);
+        result = await processLongAudioInBrowser(decodedAudio, transcriber);
+        updateProgress(90, 'Finalizing transcript...');
+    }
+
+    // --- COMMON LOGIC FOR BOTH PATHS ---
+    words = result.chunks || [];
+    fullTranscript = result.text || '';
+    
+    const wordsWithScores = words.filter(word => typeof word.score === 'number');
+    if (wordsWithScores.length > 0) {
+        const avgConfidence = wordsWithScores.reduce((sum, word) => sum + word.score, 0) / wordsWithScores.length;
+        if (!isNaN(avgConfidence)) {
+            accuracyScores.push(avgConfidence * 100);
+        }
+    }
+    
+    const detectedLang = result.language;
+    if (detectedLang) {
+        langEl.textContent = `Language: ${detectedLang.toUpperCase()}`;
+        langStatus.classList.remove('hidden');
+    }
+
+    renderTranscript();
+    
+    transcriptContainer.classList.remove('hidden');
+    updateProgress(100, 'Transcription complete!');
+    setStatus('Transcription completed successfully!', 'success');
+    
+    processedFiles++;
+    totalProcessedDuration += currentAudioDuration;
+    updateStats();
+    
+    showNotification(`Transcribed ${words.length} words`, 'success');
+    setTimeout(() => detailedProgress.classList.add('hidden'), 2000);
+
+  } catch (err) {
+    console.error("Processing error:", err);
+    let errorMessage = err.message;
+    if (err instanceof TypeError && errorMessage.includes("Failed to fetch")) {
+        errorMessage = "Connection to local server failed. Is app.py running, and is ngrok configured correctly?";
+    } else if (errorMessage.includes("HUGGING_FACE_HUB_TOKEN")) {
+        errorMessage = `Hugging Face token error: ${errorMessage}. Please set your HUGGING_FACE_HUB_TOKEN environment variable in the terminal before running app.py.`;
+    } else if (errorMessage.includes("diarization model")) {
+        errorMessage = `Diarization model load error: ${errorMessage}. Did you accept its terms on Hugging Face?`;
+    }
+    setStatus(`Error: ${errorMessage}`, 'error');
+    showNotification(`Processing failed: ${errorMessage}`, 'error');
+    detailedProgress.classList.add('hidden');
+  } finally {
+    isProcessing = false;
+    goBtn.disabled = false;
+    goBtn.innerHTML = '<span>🚀 Start Transcription</span>';
+  }
+});
+
+function basicTextCleanup(text) {
+    if (!text) return '';
+    let cleaned = text.trim()
+        .replace(/\s+/g, ' ')
+        .replace(/([.?!])\s*(?=[A-Za-z])/g, '$1 ');
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+tidyTextBtn.addEventListener('click', () => {
+  if (!fullTranscript) {
+    showNotification('No transcript available to tidy up', 'error');
+    return;
+  }
+  const correctedText = basicTextCleanup(fullTranscript);
+  correctedOutputEl.textContent = correctedText;
+  correctedContainer.classList.remove('hidden');
+  showNotification('Text has been tidied up!', 'success');
+});
+
+function download(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+downloadTranscript.addEventListener('click', () => {
+  if (!fullTranscript) { showNotification('No transcript to download', 'error'); return; }
+  const text = !correctedContainer.classList.contains('hidden') && correctedOutputEl.textContent ? correctedOutputEl.textContent : fullTranscript;
+  download(text, `transcript-${Date.now()}.txt`, 'text/plain');
+  showNotification('Transcript downloaded!', 'success');
+});
+
+copyTranscript.addEventListener('click', async () => {
+  if (!fullTranscript) { showNotification('No transcript to copy', 'error'); return; }
+  const text = !correctedContainer.classList.contains('hidden') && correctedOutputEl.textContent ? correctedOutputEl.textContent : fullTranscript;
+  await navigator.clipboard.writeText(text);
+  showNotification('Transcript copied to clipboard!', 'success');
+});
+
+window.exportText = function(format) {
+  if (!fullTranscript) { showNotification('No transcript to export', 'error'); return; }
+  const textToExportForTxtJson = !correctedContainer.classList.contains('hidden') && correctedOutputEl.textContent ? correctedOutputEl.textContent : fullTranscript;
+  let content, filename, mimeType = 'text/plain';
+  const timestamp = Date.now();
+
+  switch (format) {
+    case 'txt': content = textToExportForTxtJson; filename = `transcript-${timestamp}.txt`; break;
+    case 'srt': content = generateSubtitle(words, 'srt'); filename = `transcript-${timestamp}.srt`; mimeType = 'text/srt'; break;
+    case 'vtt': content = generateSubtitle(words, 'vtt'); filename = `transcript-${timestamp}.vtt`; mimeType = 'text/vtt'; break;
+    case 'json':
+      content = JSON.stringify({ transcript: textToExportForTxtJson, words, duration: currentAudioDuration, timestamp: new Date().toISOString() }, null, 2);
+      filename = `transcript-${timestamp}.json`; mimeType = 'application/json'; break;
+    default: return;
+  }
+  download(content, filename, mimeType);
+  showNotification(`Exported as ${format.toUpperCase()}!`, 'success');
+};
+
+function generateSubtitle(words, format) {
+  if (!words.length) return '';
+  let output = format === 'vtt' ? 'WEBVTT\n\n' : '';
+  let index = 1;
+  let currentCaptionWords = [];
+  let currentCaptionSpeaker = null;
+
+  const formatTime = (seconds) => {
+    const decimalSeparator = format === 'vtt' ? '.' : ',';
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    const ms = Math.floor((seconds * 1000) % 1000).toString().padStart(3, '0');
+    return `${h}:${m}:${s}${decimalSeparator}${ms}`;
+  };
+
+  const writeCaption = () => {
+    if (currentCaptionWords.length === 0) return;
+
+    const startTime = currentCaptionWords[0].timestamp[0];
+    const endTime = currentCaptionWords[currentCaptionWords.length - 1].timestamp[1];
+
+    if (format === 'srt') {
+        output += `${index++}\n`;
+    }
+    output += `${formatTime(startTime)} --> ${formatTime(endTime)}\n`;
+
+    let lineText = currentCaptionWords.map(w => w.text.trim()).join(' ').trim();
+
+    if (currentCaptionSpeaker && currentCaptionSpeaker !== "UNKNOWN" && currentCaptionSpeaker !== "NO_SPEAKER") {
+        lineText = `${currentCaptionSpeaker}: ${lineText}`;
+    }
+
+    output += `${lineText}\n\n`;
+
+    currentCaptionWords = [];
+    currentCaptionSpeaker = null;
+  };
+
+  words.forEach((word, i) => {
+    if (!word.text || word.text.trim() === '' || !word.timestamp || word.timestamp.length < 2 || isNaN(word.timestamp[0]) || isNaN(word.timestamp[1])) {
+        return;
+    }
+
+    const isLastWord = i === words.length - 1;
+    const nextWord = isLastWord ? null : words[i + 1];
+    
+    const gapToNextWord = (nextWord && nextWord.timestamp && !isNaN(nextWord.timestamp[0]) && !isNaN(word.timestamp[1]))
+                            ? nextWord.timestamp[0] - word.timestamp[1]
+                            : 0;
+
+    const currentWordSpeaker = word.speaker || null;
+    
+    const shouldBreakCaption = currentCaptionWords.length > 0 && (
+        (currentWordSpeaker && currentCaptionSpeaker && currentWordSpeaker !== currentCaptionSpeaker) ||
+        gapToNextWord > 0.75 ||
+        currentCaptionWords.length >= 10 ||
+        isLastWord
+    );
+
+    if (shouldBreakCaption) {
+        if (isLastWord && (!currentWordSpeaker || currentWordSpeaker === currentCaptionSpeaker)) {
+            currentCaptionWords.push(word);
+            writeCaption();
+            return;
+        }
+        writeCaption();
+    }
+
+    if (currentCaptionWords.length === 0 && currentWordSpeaker) {
+        currentCaptionSpeaker = currentWordSpeaker;
+    } else if (currentCaptionWords.length === 0 && !currentWordSpeaker) {
+        currentCaptionSpeaker = "UNKNOWN";
+    }
+    
+    currentCaptionWords.push(word);
+
+    if (isLastWord && currentCaptionWords.length > 0) {
+        writeCaption();
+    }
+  });
+
+  return output;
+}
+
+
+// --- PLAYER, THEME, AND KEYBOARD CONTROLS ---
+themeToggle.addEventListener('click', () => {
+  const newTheme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.body.dataset.theme = newTheme;
+  themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+});
+
+playPauseBtn.addEventListener('click', () => activePlayer().paused ? activePlayer().play() : activePlayer().pause());
+audioEl.addEventListener('play', () => { playPauseBtn.innerHTML = '&#9642;&#9642;'; });
+videoEl.addEventListener('play', () => { playPauseBtn.innerHTML = '&#9642;&#9642;'; });
+audioEl.addEventListener('pause', () => { playPauseBtn.innerHTML = '&#9654;'; });
+videoEl.addEventListener('pause', () => { playPauseBtn.innerHTML = '&#9654;'; });
+
+function updatePlayerUI() {
+    const player = activePlayer();
+    if (!player.duration) return;
+
+    timeDisplay.textContent = `${formatPlayerTime(player.currentTime)} / ${formatPlayerTime(player.duration)}`;
+    seekBarProgress.style.width = `${(player.currentTime / player.duration) * 100}%`;
+
+    const currentTime = player.currentTime;
+    let wordFound = false;
+
+    for (let i = 0; i < words.length; i++) {
+        const wordInfo = words[i];
+        if (!wordInfo.timestamp || wordInfo.timestamp.length < 2 || isNaN(wordInfo.timestamp[0]) || isNaN(wordInfo.timestamp[1])) {
+            continue;
+        }
+
+        if (currentTime >= wordInfo.timestamp[0] && currentTime <= wordInfo.timestamp[1]) {
+            const wordSpan = document.getElementById(`word-${i}`);
+            if (wordSpan && wordSpan !== currentWordSpan) {
+                if (currentWordSpan) {
+                    currentWordSpan.classList.remove('current');
+                }
+                wordSpan.classList.add('current');
+                currentWordSpan = wordSpan;
+
+                wordSpan.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            wordFound = true;
+            break;
+        }
+    }
+    if (!wordFound && currentWordSpan) {
+        currentWordSpan.classList.remove('current');
+        currentWordSpan = null;
+    }
+}
+audioEl.addEventListener('timeupdate', updatePlayerUI);
+videoEl.addEventListener('timeupdate', updatePlayerUI);
+
+
+seekBarContainer.addEventListener('click', (e) => {
+    const player = activePlayer();
+    if (!player.duration) return;
+    const bounds = seekBarContainer.getBoundingClientRect();
+    player.currentTime = ((e.clientX - bounds.left) / bounds.width) * player.duration;
+});
+
+volumeSlider.addEventListener('input', (e) => { activePlayer().volume = e.target.value; });
+
+function updateVolumeUI() {
+    const player = activePlayer();
+    volumeSlider.value = player.volume;
+    volumeBtn.textContent = player.volume === 0 || player.muted ? '🔇' : '🔊';
+}
+audioEl.addEventListener('volumechange', updateVolumeUI);
+videoEl.addEventListener('volumechange', updateVolumeUI);
+volumeBtn.addEventListener('click', () => {
+    const player = activePlayer();
+    player.muted = !player.muted;
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName !== 'BODY' && e.target.tagName !== 'HTML') return;
+  if (e.ctrlKey || e.metaKey) {
+    const key = e.key.toLowerCase();
+    if (key === 'o') { e.preventDefault(); fileInput.click(); }
+    if (key === 'enter') { e.preventDefault(); if (!goBtn.disabled) goBtn.click(); }
+  }
+  if (e.code === 'Space' && !mediaContainer.classList.contains('hidden')) {
+    e.preventDefault();
+    playPauseBtn.click();
+  }
+});
+
+// --- DRAG & DROP AND INIT ---
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => document.body.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }));
+document.body.addEventListener('dragenter', () => document.body.style.background = 'var(--accent-color)');
+document.body.addEventListener('dragleave', () => document.body.style.background = '');
+document.body.addEventListener('drop', (e) => {
+  document.body.style.background = '';
+  const droppedFiles = e.dataTransfer.files;
+  if (droppedFiles.length > 0 && (droppedFiles[0].type.startsWith('audio/') || droppedFiles[0].type.startsWith('video/'))) {
+    fileInput.files = droppedFiles;
+    fileInput.dispatchEvent(new Event('change'));
+  } else {
+    showNotification('Please drop a valid audio or video file.', 'error');
+  }
+});
+
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    if (!particlesContainer) return;
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        particlesContainer.appendChild(particle);
+    }
+}
+
+setStatus('Ready to transcribe your media files • Drop files or click to browse');
+setTimeout(() => { if (processedFiles === 0) showNotification('💡 Tip: For max accuracy, select a Local Backend model and run app.py!', 'info'); }, 5000);
+createParticles();
+</script>
+</body>
+</html>
