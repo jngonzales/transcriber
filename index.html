@@ -1062,9 +1062,156 @@
       border-top: 1px solid var(--border-color); /* A subtle separator line */
       background: var(--secondary-bg); /* A slightly different background */
     }
+
+    /* --- NEW MODAL STYLES --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: var(--shadow-hover);
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: left;
+      position: relative;
+    }
+
+    .modal-overlay.visible .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-content h2 {
+      font-size: 1.8rem;
+      background: var(--gradient-3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .modal-content h3 {
+        color: var(--text-primary);
+        margin-top: 25px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 5px;
+    }
+
+    .modal-content p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 15px;
+    }
+
+    .modal-content ul {
+        list-style-position: inside;
+        padding-left: 10px;
+        margin-bottom: 20px;
+    }
+
+    .modal-content li {
+        margin-bottom: 10px;
+        color: var(--text-secondary);
+    }
+
+    .modal-content strong {
+        color: var(--accent-color);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close-btn:hover {
+        transform: scale(1.1) rotate(90deg);
+        background: var(--error-color);
+        color: white;
+    }
+
+    .email-link {
+        color: var(--accent-hover);
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .email-link:hover {
+        text-decoration: underline;
+    }
   </style>
 </head>
 <body data-theme="dark">
+
+  <!-- UPDATE NOTICE MODAL -->
+  <div class="modal-overlay" id="updateNoticeModal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="closeNoticeBtn">&times;</button>
+      <h2>🚀 Important Notice</h2>
+      <p>Please read the following for the best experience:</p>
+      
+      <h3>Browser Models (Tiny, Base, Small)</h3>
+      <p>These models run directly in your browser using WebGPU technology. For optimal performance and compatibility, please use a modern browser like:</p>
+      <ul>
+        <li><strong>Google Chrome</strong></li>
+        <li><strong>Microsoft Edge</strong></li>
+        <li><strong>Brave</strong></li>
+        <li><strong>Firefox Nightly</strong></li>
+      </ul>
+  
+      <h3>Local Backend Models (Large v3)</h3>
+      <p>
+        The <strong>Large v3</strong> models run on a local server on your computer for maximum power. If you experience connection issues:
+      </p>
+      <ul>
+        <li>Ensure the local server (`app.py`) is running.</li>
+        <li>If it's not working, please try using a <strong>VPN</strong>.</li>
+        <li>If you still have issues, feel free to contact the owner:
+          <a href="mailto:jngonz24@gmail.com" class="email-link">
+            jngonz24@gmail.com
+          </a>
+        </li>
+      </ul>
+  
+    </div>
+  </div>
+
   <div class="bg-pattern"></div>
   <div class="floating-particles" id="particles"></div>
 
@@ -1250,6 +1397,28 @@
 <script type="module">
 import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.1.0';
 
+// --- MODAL NOTICE LOGIC ---
+const updateNoticeModal = document.getElementById('updateNoticeModal');
+const closeNoticeBtn = document.getElementById('closeNoticeBtn');
+
+// Show the modal on page load
+window.addEventListener('load', () => {
+    updateNoticeModal.classList.add('visible');
+});
+
+// Hide the modal when the close button is clicked
+closeNoticeBtn.addEventListener('click', () => {
+    updateNoticeModal.classList.remove('visible');
+});
+
+// Optional: Hide the modal when clicking the overlay
+updateNoticeModal.addEventListener('click', (e) => {
+    if (e.target === updateNoticeModal) {
+        updateNoticeModal.classList.remove('visible');
+    }
+});
+
+
 // DOM Elements
 const fileInput = document.getElementById('file');
 const fileLabelText = document.getElementById('fileLabelText');
@@ -1315,7 +1484,7 @@ let currentWordSpan = null;
 
 // Define your backend URL here.
 // **** THIS HAS BEEN UPDATED WITH YOUR NGROK URL ****
-const LARGE_V3_BACKEND_URL = "https://ccdfd5935863.ngrok-free.app/transcribe";
+const LARGE_V3_BACKEND_URL = "https://a30466723cd3.ngrok-free.app/transcribe";
 
 // --- UTILITY FUNCTIONS ---
 function setStatus(msg, type = 'info') {
@@ -1993,6 +2162,4 @@ setTimeout(() => { if (processedFiles === 0) showNotification('💡 Tip: For max
 createParticles();
 </script>
 </body>
-
 </html>
-
