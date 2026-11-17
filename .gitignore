@@ -1,0 +1,10 @@
+# Secrets
+token.txt
+.env
+.env.*
+
+# Local tooling
+ngrok.exe
+.ngrok.exe.old
+*.pyc
+__pycache__/
